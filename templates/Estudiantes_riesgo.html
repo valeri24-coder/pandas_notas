@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estudiantes en Riesgo</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0f1e3d; --blue: #2451b7; --accent: #4f9cf9;
+      --danger: #e63946; --danger-soft: #fff0f0;
+      --success: #2a9d5c; --success-soft: #f0faf4;
+      --bg: #f0f4fc; --surface: #ffffff; --surface2: #f7f9fe;
+      --border: #dce5f5; --text: #1a2440; --text-mid: #4a5775; --text-light: #8a96b0;
+      --radius: 12px; --radius-sm: 8px; --shadow: 0 2px 16px rgba(15,30,61,0.09);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    .page { max-width: 860px; margin: 0 auto; padding: 36px 24px; }
+
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--text-light); margin-bottom: 24px; }
+    .breadcrumb a { color: var(--blue); text-decoration: none; }
+
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .page-title { font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--navy); letter-spacing: -0.03em; }
+
+    .status-banner {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 20px; border-radius: var(--radius);
+      margin-bottom: 24px; font-size: 0.88rem;
+    }
+
+    .status-banner.danger {
+      background: var(--danger-soft); border: 1px solid #fcccd0;
+    }
+
+    .status-banner.success {
+      background: var(--success-soft); border: 1px solid #b8e8ce;
+    }
+
+    .status-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+
+    .status-banner.danger .status-icon { background: #ffd7d9; }
+    .status-banner.success .status-icon { background: #c8eedd; }
+
+    .status-body {}
+    .status-title { font-weight: 700; font-size: 0.95rem; }
+    .status-banner.danger .status-title { color: var(--danger); }
+    .status-banner.success .status-title { color: var(--success); }
+    .status-sub { font-size: 0.82rem; color: var(--text-light); margin-top: 2px; }
+
+    .table-wrap { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); }
+
+    table { width: 100%; border-collapse: collapse; background: var(--surface); }
+
+    thead th {
+      background: var(--navy); color: rgba(255,255,255,0.85);
+      font-size: 0.73rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
+      padding: 11px 18px; text-align: left;
+    }
+
+    tbody tr { transition: background 0.12s; }
+    tbody tr:hover { background: #fef6f6; }
+    tbody td { padding: 13px 18px; font-size: 0.87rem; color: var(--text-mid); border-bottom: 1px solid var(--border); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .badge-danger {
+      display: inline-block; background: #ffebeb; color: var(--danger);
+      font-size: 0.78rem; font-weight: 700; padding: 3px 11px; border-radius: 20px;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px; border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif; font-size: 0.84rem; font-weight: 600;
+      text-decoration: none; transition: all 0.18s;
+    }
+    .btn-ghost { background: transparent; color: var(--text-mid); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="breadcrumb">
+    <a href="/dashprincipal">Dashboard</a>
+    <span>›</span>
+    <span>Riesgo Académico</span>
+  </div>
+
+  <div class="page-header">
+    <h1 class="page-title">Estudiantes en Riesgo</h1>
+    <a href="/dashprincipal" class="btn btn-ghost">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver
+    </a>
+  </div>
+
+  {% if total > 0 %}
+  <div class="status-banner danger">
+    <div class="status-icon">🚨</div>
+    <div class="status-body">
+      <div class="status-title">Alerta de Riesgo Académico</div>
+      <div class="status-sub">Se encontraron <strong>{{ total }}</strong> estudiante(s) con promedio menor a 3.0.</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Carrera</th>
+          <th>Promedio</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for est in estudiantes %}
+        <tr>
+          <td><strong style="color:var(--text)">{{ est.nombre }}</strong></td>
+          <td>{{ est.carrera }}</td>
+          <td><span class="badge-danger">{{ est.promedio }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div class="status-banner success">
+    <div class="status-icon">✅</div>
+    <div class="status-body">
+      <div class="status-title">Sin alertas activas</div>
+      <div class="status-sub">No hay estudiantes en riesgo académico actualmente.</div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+</body>
+</html>
+{% endblock %}

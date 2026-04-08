@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking Académico</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0f1e3d;
+      --blue: #2451b7;
+      --blue-light: #3b6fd4;
+      --accent: #4f9cf9;
+      --bg: #f0f4fc;
+      --surface: #ffffff;
+      --surface2: #f7f9fe;
+      --border: #dce5f5;
+      --text: #1a2440;
+      --text-mid: #4a5775;
+      --text-light: #8a96b0;
+      --gold: #d4a017;
+      --silver: #9aa8b5;
+      --bronze: #b87333;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 2px 16px rgba(15,30,61,0.09);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    header {
+      background: var(--navy); padding: 0 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px; box-shadow: 0 2px 24px rgba(10,20,50,0.22);
+    }
+    .logo { font-family: 'Sora', sans-serif; font-size: 1rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 8px; }
+    .logo-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+    nav a { font-size: 0.82rem; font-weight: 500; color: rgba(255,255,255,0.7); text-decoration: none; padding: 7px 13px; border-radius: 8px; transition: all 0.18s; }
+    nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+
+    .page { max-width: 800px; margin: 0 auto; padding: 40px 24px; }
+
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--text-light); margin-bottom: 24px; }
+    .breadcrumb a { color: var(--blue); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .page-title { font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--navy); letter-spacing: -0.03em; }
+    .page-subtitle { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
+
+    .podium {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .podium-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .podium-card.first {
+      border-color: #f0d080;
+      background: linear-gradient(160deg, #fffbef 0%, #fff 100%);
+      transform: translateY(-4px);
+    }
+
+    .podium-medal {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .podium-name {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .podium-carrera {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-bottom: 10px;
+    }
+
+    .podium-score {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .podium-card.first .podium-score { color: var(--gold); }
+    .podium-card.second .podium-score { color: var(--silver); }
+    .podium-card.third .podium-score { color: var(--bronze); }
+
+    /* Rest table */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .table-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-light);
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead th {
+      background: var(--navy);
+      color: rgba(255,255,255,0.8);
+      font-size: 0.74rem; font-weight: 600;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      padding: 11px 20px; text-align: left;
+    }
+
+    tbody tr { transition: background 0.12s; }
+    tbody tr:hover { background: var(--surface2); }
+
+    tbody td { padding: 13px 20px; font-size: 0.87rem; color: var(--text-mid); border-bottom: 1px solid var(--border); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .rank-num {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-light);
+      width: 32px;
+    }
+
+    .score-pill {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: #e8f0fe;
+      color: var(--blue);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--text-light);
+    }
+
+    .empty-state-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 0.9rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 18px; border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif; font-size: 0.83rem; font-weight: 600;
+      text-decoration: none; cursor: pointer; border: none; transition: all 0.18s;
+    }
+    .btn-ghost { background: transparent; color: var(--text-mid); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-dot"></div> Dashboard</div>
+  <nav><a href="/dashprincipal">← Dashboard</a></nav>
+</header>
+
+<div class="page">
+
+  <div class="breadcrumb">
+    <a href="/dashprincipal">Dashboard</a>
+    <span>›</span>
+    <span>Ranking</span>
+  </div>
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Ranking Académico</h1>
+      <p class="page-subtitle">Top 10 mejores estudiantes por promedio</p>
+    </div>
+    <a href="/dashprincipal" class="btn btn-ghost">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver
+    </a>
+  </div>
+
+  {% if ranking %}
+
+  <!-- Podio top 3 -->
+  {% if ranking|length >= 3 %}
+  <div class="podium">
+    <div class="podium-card second">
+      <span class="podium-medal">🥈</span>
+      <div class="podium-name">{{ ranking[1].nombre }}</div>
+      <div class="podium-carrera">{{ ranking[1].carrera }}</div>
+      <div class="podium-score">{{ ranking[1].promedio }}</div>
+    </div>
+    <div class="podium-card first">
+      <span class="podium-medal">🥇</span>
+      <div class="podium-name">{{ ranking[0].nombre }}</div>
+      <div class="podium-carrera">{{ ranking[0].carrera }}</div>
+      <div class="podium-score">{{ ranking[0].promedio }}</div>
+    </div>
+    <div class="podium-card third">
+      <span class="podium-medal">🥉</span>
+      <div class="podium-name">{{ ranking[2].nombre }}</div>
+      <div class="podium-carrera">{{ ranking[2].carrera }}</div>
+      <div class="podium-score">{{ ranking[2].promedio }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Tabla completa -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <span class="table-label">Clasificación completa</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nombre</th>
+          <th>Carrera</th>
+          <th>Promedio</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for est in ranking %}
+        <tr>
+          <td><span class="rank-num">{{ est.posicion }}</span></td>
+          <td><strong style="color:var(--text);">{{ est.nombre }}</strong></td>
+          <td>{{ est.carrera }}</td>
+          <td><span class="score-pill">{{ est.promedio }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+
+  <div class="table-wrap">
+    <div class="empty-state">
+      <div class="empty-state-icon">📋</div>
+      <p>No hay estudiantes registrados aún.</p>
+    </div>
+  </div>
+
+  {% endif %}
+
+</div>
+
+</body>
+</html>
