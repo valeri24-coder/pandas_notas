@@ -1,2 +1,1 @@
-web: gunicorn pandas:app
- 
+gunicorn app:server
